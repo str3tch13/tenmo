@@ -1,6 +1,12 @@
 package com.techelevator.tenmo;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.web.client.RestTemplate;
+
 import com.techelevator.tenmo.models.AuthenticatedUser;
+import com.techelevator.tenmo.models.User;
 import com.techelevator.tenmo.models.UserCredentials;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.AuthenticationServiceException;
@@ -21,6 +27,9 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 	private static final String MAIN_MENU_OPTION_VIEW_PENDING_REQUESTS = "View your pending requests";
 	private static final String MAIN_MENU_OPTION_LOGIN = "Login as different user";
 	private static final String[] MAIN_MENU_OPTIONS = { MAIN_MENU_OPTION_VIEW_BALANCE, MAIN_MENU_OPTION_SEND_BUCKS, MAIN_MENU_OPTION_VIEW_PAST_TRANSFERS, MAIN_MENU_OPTION_REQUEST_BUCKS, MAIN_MENU_OPTION_VIEW_PENDING_REQUESTS, MAIN_MENU_OPTION_LOGIN, MENU_OPTION_EXIT };
+	
+	public RestTemplate restTemplate = new RestTemplate();
+	public static String AUTH_TOKEN = "";
 	
     private AuthenticatedUser currentUser;
     private ConsoleService console;
@@ -49,7 +58,7 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		while(true) {
 			String choice = (String)console.getChoiceFromOptions(MAIN_MENU_OPTIONS);
 			if(MAIN_MENU_OPTION_VIEW_BALANCE.equals(choice)) {
-				viewCurrentBalance();
+				viewCurrentBalance(choice);
 			} else if(MAIN_MENU_OPTION_VIEW_PAST_TRANSFERS.equals(choice)) {
 				viewTransferHistory();
 			} else if(MAIN_MENU_OPTION_VIEW_PENDING_REQUESTS.equals(choice)) {
@@ -67,10 +76,21 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		}
 	}
 
-	private void viewCurrentBalance() {
-		// TODO Auto-generated method stub
+	private void viewCurrentBalance(String username) {
+		double userBalance = 0.0;
+		userBalance = restTemplate.exchange(API_BASE_URL + username, HttpMethod.GET, makeAuthEntity() , double.class).getBody();
 		
 	}
+
+
+
+    private HttpEntity makeAuthEntity() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(AUTH_TOKEN);
+        HttpEntity entity = new HttpEntity<>(headers);
+        return entity;
+    }
+
 
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub

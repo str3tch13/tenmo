@@ -88,4 +88,13 @@ public class UserSqlDAO implements UserDAO {
         user.setAuthorities("ROLE_USER");
         return user;
     }
+    
+    public double viewCurrentBalance(String username) {
+    	return jdbcTemplate.queryForObject("SELECT balance FROM accounts "
+    			+ "JOIN users ON users.user_id = accounts.user_id "
+    			+ "WHERE users.user_id = ?;", double.class, username);    	
+    
+    }
+    
+    
 }
