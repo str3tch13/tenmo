@@ -10,6 +10,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.techelevator.tenmo.model.User;
 
@@ -22,7 +23,7 @@ public class UserSqlDAO implements UserDAO {
     public UserSqlDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-
+    
     @Override
     public int findIdByUsername(String username) {
         return jdbcTemplate.queryForObject("select user_id from users where username = ?", int.class, username);
@@ -89,12 +90,7 @@ public class UserSqlDAO implements UserDAO {
         return user;
     }
     
-    public double viewCurrentBalance(String username) {
-    	return jdbcTemplate.queryForObject("SELECT balance FROM accounts "
-    			+ "JOIN users ON users.user_id = accounts.user_id "
-    			+ "WHERE users.user_id = ?;", double.class, username);    	
-    
-    }
+   
     
     
 }

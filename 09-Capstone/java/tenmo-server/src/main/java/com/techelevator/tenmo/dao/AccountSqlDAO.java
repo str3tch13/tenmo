@@ -1,50 +1,46 @@
 package com.techelevator.tenmo.dao;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.techelevator.tenmo.model.Account;
 
-@Component
-public class AccountSqlDAO implements AccountDAO{
+@Service
+public class AccountSqlDAO implements AccountDAO {
 
-	 private JdbcTemplate jdbcTemplate;
-	 public AccountSqlDAO(JdbcTemplate jdbcTemplate) {
-			this.jdbcTemplate = jdbcTemplate;
-		}
+	private JdbcTemplate jdbcTemplate;
 
-	 @Override
-	 public BigDecimal viewCurrentBalance(String username) {
-		
-	    	return jdbcTemplate.queryForObject("SELECT balance FROM accounts "
-	    			+ "JOIN users ON users.user_id = accounts.user_id "
-	    			+ "WHERE users.user_id = ?;", BigDecimal.class, username);    	
-	    
-	    }
-
-	@Override
-	public List<Account> findAll() {
-		List<Account> accounts = new ArrayList<>();
-		SqlRowSet results = jdbcTemplate.queryForRowSet("SELECT * FROM accounts");
-		while(results.next()) {
-			Account account = mapRowToAccount(results);
-			accounts.add(account);
-		}
-		return accounts;
+	public AccountSqlDAO(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	private Account mapRowToAccount(SqlRowSet results) {
-		Account account = new Account();
-        account.setaccountId(results.getInt("account_id"));
-        account.setuserId(results.getInt("user_id"));
-        account.setbalance(results.getBigDecimal("balance"));
-        return account;
+	@Override
+	public Account getAccountByUserId (Long userId) {
+		Account account = null;
+		String sql = "SELECT account_id, user_id, balance FROM accounts WHERE user_id = ?";
+			
+		SqlRowSet results = jdbcTemplate.queryForRowSet(sql, userId);
+		while(results.next()) {
+			account = mapRowToAccount(results);
+		}
+		return account;
+	}
+	@Override 
+	public void updateBalance(Account account) {
+		String sql = "UPDATE accounts SET balance = ? Where account_id = ?";
+		jdbcTemplate.update(sql, account.getBalance(), account.getAccountId());
 		
+	}
+
+	
+	private Account mapRowToAccount(SqlRowSet rs) {
+	return new Account(rs.getLong("account_id"), rs.getLong("user_id"), rs.getBigDecimal("balance"));
+	
+
+	
+
 	}
 
 }

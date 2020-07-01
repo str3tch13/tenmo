@@ -27,6 +27,7 @@ public class AuthenticationService {
         HttpEntity<UserCredentials> entity = createRequestEntity(credentials);
         return sendLoginRequest(entity);
     }
+   
 
     public void register(UserCredentials credentials) throws AuthenticationServiceException {
     	HttpEntity<UserCredentials> entity = createRequestEntity(credentials);
