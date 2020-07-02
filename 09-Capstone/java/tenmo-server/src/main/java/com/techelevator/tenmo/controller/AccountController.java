@@ -32,7 +32,7 @@ public class AccountController {
 		return accountDAO.getAccountByUserId(userId).getBalance();
 	}
 
-	private Long getCurrentUserId(Principal principal) {
+	public Long getCurrentUserId(Principal principal) {
 		return userDAO.findByUsername(principal.getName()).getId();
 	}
 

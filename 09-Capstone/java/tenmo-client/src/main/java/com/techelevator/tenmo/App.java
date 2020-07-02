@@ -1,7 +1,7 @@
 package com.techelevator.tenmo;
 
 import java.math.BigDecimal;
-
+import java.util.List;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +14,8 @@ import com.techelevator.tenmo.models.UserCredentials;
 import com.techelevator.tenmo.services.AccountService;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.AuthenticationServiceException;
+import com.techelevator.tenmo.services.TransferService;
+import com.techelevator.tenmo.services.UserService;
 import com.techelevator.view.ConsoleService;
 
 public class App {
@@ -40,26 +42,27 @@ public class App {
 
 	private AuthenticatedUser currentUser;
 	private ConsoleService console;
+	private User user;
 	private AuthenticationService authenticationService;
 	private AccountService accountService;
-	// private UserService userService;
-	// private TransferService transferService;
+	private UserService userService;
+	private TransferService transferService;
 
 	public static void main(String[] args) {
-		App app = new App(new ConsoleService(System.in, System.out),
-						  new AuthenticationService(API_BASE_URL),
-						  new AccountService(API_BASE_URL));
-						  // new UserService(API_BASE_URL),
-						  //new TransferService(API_BASE_URL),
-		
-	
+		App app = new App(new ConsoleService(System.in, System.out), new AuthenticationService(API_BASE_URL),
+				new AccountService(API_BASE_URL), new UserService(API_BASE_URL),
+		 new TransferService(API_BASE_URL));
+
 		app.run();
 	}
 
-	public App(ConsoleService console, AuthenticationService authenticationService, AccountService accountService) {
+	public App(ConsoleService console, AuthenticationService authenticationService, AccountService accountService,
+			UserService userService,TransferService transferService) {
 		this.console = console;
 		this.authenticationService = authenticationService;
 		this.accountService = accountService;
+		this.userService = userService;
+		this.transferService = transferService;
 	}
 
 	public void run() {
@@ -110,10 +113,22 @@ public class App {
 	}
 
 	private void sendBucks() {
-		// TODO Auto-generated method stub
+		System.out.println("-------------------------------------------");
+		System.out.println("Users");
+		System.out.println("ID          Name");
+		System.out.println("-------------------------------------------");
+		User[] getUsers = userService.getUsers(currentUser.getToken());
+		for (User items : getUsers) {
+
+			System.out.println(items.getId() + "           " + items.getUsername());
 
 	}
 
+		System.out.println("---------");
+		System.out.println("         ");
+		System.out.println("Enter ID of user you are sending to (0 to cancel):");
+		System.out.println("Enter amount:");
+	}
 	private void requestBucks() {
 		// TODO Auto-generated method stub
 

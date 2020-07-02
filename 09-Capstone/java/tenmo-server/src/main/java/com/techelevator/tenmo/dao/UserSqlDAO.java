@@ -80,15 +80,15 @@ public class UserSqlDAO implements UserDAO {
         return userCreated && accountCreated;
     }
 
-    private User mapRowToUser(SqlRowSet rs) {
-        User user = new User();
-        user.setId(rs.getLong("user_id"));
-        user.setUsername(rs.getString("username"));
-        user.setPassword(rs.getString("password_hash"));
-        user.setActivated(true);
-        user.setAuthorities("ROLE_USER");
-        return user;
-    }
+	private User mapRowToUser(SqlRowSet rs) {
+		User user = new User();
+		user.setId(rs.getLong("user_id"));
+		user.setUsername(rs.getString("username"));
+		user.setPassword(rs.getString("password_hash"));
+		user.setActivated(true);
+		user.setAuthorities("ROLE_USER");
+		return user;
+	}
     
    
     
