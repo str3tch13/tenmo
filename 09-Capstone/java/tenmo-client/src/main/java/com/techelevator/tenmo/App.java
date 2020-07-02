@@ -9,6 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
 
 import com.techelevator.tenmo.models.AuthenticatedUser;
+import com.techelevator.tenmo.models.Transfer;
 import com.techelevator.tenmo.models.User;
 import com.techelevator.tenmo.models.UserCredentials;
 import com.techelevator.tenmo.services.AccountService;
@@ -50,14 +51,13 @@ public class App {
 
 	public static void main(String[] args) {
 		App app = new App(new ConsoleService(System.in, System.out), new AuthenticationService(API_BASE_URL),
-				new AccountService(API_BASE_URL), new UserService(API_BASE_URL),
-		 new TransferService(API_BASE_URL));
+				new AccountService(API_BASE_URL), new UserService(API_BASE_URL), new TransferService(API_BASE_URL));
 
 		app.run();
 	}
 
 	public App(ConsoleService console, AuthenticationService authenticationService, AccountService accountService,
-			UserService userService,TransferService transferService) {
+			UserService userService, TransferService transferService) {
 		this.console = console;
 		this.authenticationService = authenticationService;
 		this.accountService = accountService;
@@ -113,22 +113,21 @@ public class App {
 	}
 
 	private void sendBucks() {
-		System.out.println("-------------------------------------------");
-		System.out.println("Users");
-		System.out.println("ID          Name");
-		System.out.println("-------------------------------------------");
-		User[] getUsers = userService.getUsers(currentUser.getToken());
-		for (User items : getUsers) {
-
-			System.out.println(items.getId() + "           " + items.getUsername());
-
+		showUser();
+		Integer toUserId = console.getUserInputInteger("Enter ID of user you are sending to (0 to cancel)");
+		if (toUserId != 0) {
+			int amount = console.getUserInputInteger("Enter amount");
+			BigDecimal amountBD = new BigDecimal(amount);
+			Transfer transfer = new Transfer(amountBD, toUserId);
+			transferService.createTransfer(transfer, currentUser.getToken());
+			System.out.println(amount + " TE Bucks were sent to user " + toUserId);
+		} else {
+			System.out.println("Cancelling transfer...");
+		}
+	
 	}
 
-		System.out.println("---------");
-		System.out.println("         ");
-		System.out.println("Enter ID of user you are sending to (0 to cancel):");
-		System.out.println("Enter amount:");
-	}
+
 	private void requestBucks() {
 		// TODO Auto-generated method stub
 
@@ -192,5 +191,22 @@ public class App {
 		String username = console.getUserInput("Username");
 		String password = console.getUserInput("Password");
 		return new UserCredentials(username, password);
+	}
+
+	public void showUser() {
+		System.out.println("-------------------------------------------");
+
+		System.out.println("Users");
+		System.out.println("ID          Name");
+		System.out.println("-------------------------------------------");
+		User[] getUsers = userService.getUsers(currentUser.getToken());
+		for (User items : getUsers) {
+
+			System.out.println(items.getId() + "           " + items.getUsername());
+
+		}
+
+		System.out.println("---------");
+		System.out.println("         ");
 	}
 }

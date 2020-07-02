@@ -1,5 +1,7 @@
 package com.techelevator.tenmo.dao;
 
+import java.math.BigDecimal;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
@@ -16,9 +18,33 @@ public class TransferSqlDAO implements TransferDAO {
 	}
 
 	@Override
+	public void preTransfer(Transfer transfer) {
+		String sqlBalanceString = "SELECT balance\r\n" + 
+				"FROM accounts\r\n" + 
+				"JOIN transfers ON accounts.account_id = transfers.account_from\r\n" + 
+				"WHERE accounts.account_id = 2;";
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlBalanceString, transfer.getAccount_from());
+		BigDecimal amountToTransfer = transfer.getAmount();
+		BigDecimal stringInt = BigDecimal(sqlBalanceString);
+		if (amountToTransfer.compareTo(stringInt) == -1) {
+		 initiateTransfer(transfer);
+		}
+		System.out.println("Not enough funds. Rejected : " + transfer.getTransfer_status_id());
+		
+		
+	}
+	
+	
+	private BigDecimal BigDecimal(String sqlBalanceString) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public Transfer initiateTransfer(Transfer transfer) {
+		
 		String sql = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from,account_to, amount)"
-				+ "VALUES (2, 1, 2, 1, 100) RETURNING *;";
+				+ "VALUES (2,1,?,?,?) RETURNING *;";
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(sql, transfer.getAccount_from(), transfer.getAccount_to(),
 				transfer.getAmount());
 		while (rs.next()) {
@@ -37,11 +63,11 @@ public class TransferSqlDAO implements TransferDAO {
 				+ "SET balance = balance - (SELECT amount FROM transfers WHERE transfer_id = ? AND transfer_status_id = 1) "
 				+ "WHERE account_id = (SELECT account_from FROM transfers WHERE transfer_id = ? AND transfer_status_id = 1); "
 				+ "UPDATE transfers "
-				+ "SET transfer_status_id = ?"
+				+ "SET transfer_status_id = 2"
 				+ " WHERE transfer_id = ?;"
 				+ " COMMIT;";
 		int updatedCount = jdbcTemplate.update(sql, transfer.getTransfer_id(), transfer.getTransfer_id(),
-				transfer.getTransfer_id(), transfer.getTransfer_id());
+				transfer.getTransfer_id(), transfer.getTransfer_id(), transfer.getTransfer_id());
 		if (updatedCount == 3) {
 			result = true;
 		}

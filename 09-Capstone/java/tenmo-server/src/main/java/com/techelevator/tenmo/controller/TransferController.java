@@ -45,6 +45,7 @@ public class TransferController {
 		return pendingTransfer;
 	}
 
+	//updates both accounts from the transfer
 	@RequestMapping(value = "/transfer", method = RequestMethod.PUT)
 	public void makeTransfer(@RequestBody Transfer transfer) {
 		transferDAO.updateBalances(transfer);

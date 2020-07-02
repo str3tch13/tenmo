@@ -25,6 +25,8 @@ public class AccountController {
 		this.accountDAO = accountDAO;
 		this.userDAO = userDAO;
 	}
+	
+	//gets balance form logged in user
 
 	@RequestMapping(value = "/balance", method = RequestMethod.GET)
 	public BigDecimal getBalance(Principal principal) throws UsernameNotFoundException {
