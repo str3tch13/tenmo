@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 public class Transfer {
 	private BigDecimal amount;
 	private int account_to;
+	//private int account_from;
 	
 	
 	public Transfer(BigDecimal amount, int account_to) {
@@ -12,6 +13,15 @@ public class Transfer {
 		this.amount = amount;
 		this.account_to = account_to;
 	}
+		//this.account_from = account_from;
+//	}
+//	public int getAccount_from() {
+//		return account_from;
+//	}
+//	public void setAccount_from(int account_from) {
+//		this.account_from = account_from;
+//	}
+
 	public BigDecimal getAmount() {
 		return amount;
 	}

@@ -7,6 +7,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 
 import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.TransferDTO;
 
 @Service
 public class TransferSqlDAO implements TransferDAO {
@@ -17,23 +18,25 @@ public class TransferSqlDAO implements TransferDAO {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	@Override
-	public void preTransfer(Transfer transfer) {
-		String sqlBalanceString = "SELECT balance\r\n" + 
-				"FROM accounts\r\n" + 
-				"JOIN transfers ON accounts.account_id = transfers.account_from\r\n" + 
-				"WHERE accounts.account_id = 2;";
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlBalanceString, transfer.getAccount_from());
-		BigDecimal amountToTransfer = transfer.getAmount();
-		BigDecimal stringInt = BigDecimal(sqlBalanceString);
-		if (amountToTransfer.compareTo(stringInt) == -1) {
-		 initiateTransfer(transfer);
-		}
-		System.out.println("Not enough funds. Rejected : " + transfer.getTransfer_status_id());
+	//@Override
+//	public void preTransfer(Transfer transfer) {
+//		String sqlBalanceString = "SELECT balance\r\n" + 
+//				"FROM accounts\r\n" + 
+//				"JOIN transfers ON accounts.account_id = transfers.account_from\r\n" + 
+//				"WHERE accounts.account_id = ?;";
+//		SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlBalanceString, transfer.getAccount_from());
+//		BigDecimal amountToTransfer = transfer.getAmount();
+//		BigDecimal stringInt = BigDecimal(sqlBalanceString);
+//		if (amountToTransfer.compareTo(stringInt) == -1) {
+//		 initiateTransfer(transfer);
+//		}
+//		System.out.println("Not enough funds. Rejected : " + transfer.getTransfer_status_id());
+//		
+//		
+//	}
+//	
+//	}
 		
-		
-	}
-	
 	
 	private BigDecimal BigDecimal(String sqlBalanceString) {
 		// TODO Auto-generated method stub
@@ -42,17 +45,37 @@ public class TransferSqlDAO implements TransferDAO {
 
 	@Override
 	public Transfer initiateTransfer(Transfer transfer) {
+		String sqlBalanceString = "SELECT balance FROM accounts WHERE account_id = ?;";
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlBalanceString, transfer.getAccount_from());
+		BigDecimal amountToTransfer = transfer.getAmount();
+		BigDecimal stringInt = null;
+		if(rs.next()) {
+		 stringInt =new BigDecimal(rs.getString("balance"));
+		}
+		if (amountToTransfer.compareTo(stringInt) == -1) {
+		// initiateTransfer(transfer);
+		//}
+		
+		
+	
+	
 		
 		String sql = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from,account_to, amount)"
-				+ "VALUES (2,1,?,?,?) RETURNING *;";
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(sql, transfer.getAccount_from(), transfer.getAccount_to(),
+				+ "VALUES (2,1,?,?,?) RETURNING transfer_id;";
+		SqlRowSet rs1 = jdbcTemplate.queryForRowSet(sql, transfer.getAccount_from(), transfer.getAccount_to(),
 				transfer.getAmount());
-		while (rs.next()) {
-			transfer = mapRowToTransfer(rs);
+		if (rs1.next()) {
+			transfer.setTransfer_id(rs1.getInt("transfer_id"));
 		}
 		return transfer;
+	} else {
+		System.out.println("Not enough funds. Rejected : " + transfer.getTransfer_status_id());
+
+		return null;
 	}
 
+	
+	}
 	@Override
 	public boolean updateBalances(Transfer transfer) {
 		boolean result = false;
@@ -84,5 +107,6 @@ public class TransferSqlDAO implements TransferDAO {
 		transfer.setAmount(rs.getBigDecimal("amount"));
 		return transfer;
 	}
+
 
 }

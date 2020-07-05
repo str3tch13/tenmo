@@ -44,6 +44,7 @@ public class App {
 	private AuthenticatedUser currentUser;
 	private ConsoleService console;
 	private User user;
+	private Transfer transfer;
 	private AuthenticationService authenticationService;
 	private AccountService accountService;
 	private UserService userService;
@@ -118,15 +119,14 @@ public class App {
 		if (toUserId != 0) {
 			int amount = console.getUserInputInteger("Enter amount");
 			BigDecimal amountBD = new BigDecimal(amount);
-			Transfer transfer = new Transfer(amountBD, toUserId);
-			transferService.createTransfer(transfer, currentUser.getToken());
+			Transfer transferProcess = new Transfer(amountBD, toUserId);
+			transferService.createTransfer(currentUser.getToken());
 			System.out.println(amount + " TE Bucks were sent to user " + toUserId);
 		} else {
 			System.out.println("Cancelling transfer...");
 		}
-	
-	}
 
+	}
 
 	private void requestBucks() {
 		// TODO Auto-generated method stub
