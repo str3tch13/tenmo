@@ -18,7 +18,7 @@ public class TransferSqlDAO implements TransferDAO {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	//@Override
+	// @Override
 //	public void preTransfer(Transfer transfer) {
 //		String sqlBalanceString = "SELECT balance\r\n" + 
 //				"FROM accounts\r\n" + 
@@ -36,8 +36,7 @@ public class TransferSqlDAO implements TransferDAO {
 //	}
 //	
 //	}
-		
-	
+
 	private BigDecimal BigDecimal(String sqlBalanceString) {
 		// TODO Auto-generated method stub
 		return null;
@@ -49,33 +48,29 @@ public class TransferSqlDAO implements TransferDAO {
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlBalanceString, transfer.getAccount_from());
 		BigDecimal amountToTransfer = transfer.getAmount();
 		BigDecimal stringInt = null;
-		if(rs.next()) {
-		 stringInt =new BigDecimal(rs.getString("balance"));
+		if (rs.next()) {
+			stringInt = new BigDecimal(rs.getString("balance"));
 		}
 		if (amountToTransfer.compareTo(stringInt) == -1) {
-		// initiateTransfer(transfer);
-		//}
-		
-		
-	
-	
-		
-		String sql = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from,account_to, amount)"
-				+ "VALUES (2,1,?,?,?) RETURNING transfer_id;";
-		SqlRowSet rs1 = jdbcTemplate.queryForRowSet(sql, transfer.getAccount_from(), transfer.getAccount_to(),
-				transfer.getAmount());
-		if (rs1.next()) {
-			transfer.setTransfer_id(rs1.getInt("transfer_id"));
+			// initiateTransfer(transfer);
+			// }
+
+			String sql = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from,account_to, amount)"
+					+ "VALUES (2,1,?,?,?) RETURNING transfer_id;";
+			SqlRowSet rs1 = jdbcTemplate.queryForRowSet(sql, transfer.getAccount_from(), transfer.getAccount_to(),
+					transfer.getAmount());
+			if (rs1.next()) {
+				transfer.setTransfer_id(rs1.getInt("transfer_id"));
+			}
+			return transfer;
+		} else {
+			System.out.println("Not enough funds. Rejected : " + transfer.getTransfer_status_id());
+
+			return null;
 		}
-		return transfer;
-	} else {
-		System.out.println("Not enough funds. Rejected : " + transfer.getTransfer_status_id());
 
-		return null;
 	}
 
-	
-	}
 	@Override
 	public boolean updateBalances(Transfer transfer) {
 		boolean result = false;
@@ -85,10 +80,7 @@ public class TransferSqlDAO implements TransferDAO {
 				+ "UPDATE accounts "
 				+ "SET balance = balance - (SELECT amount FROM transfers WHERE transfer_id = ? AND transfer_status_id = 1) "
 				+ "WHERE account_id = (SELECT account_from FROM transfers WHERE transfer_id = ? AND transfer_status_id = 1); "
-				+ "UPDATE transfers "
-				+ "SET transfer_status_id = 2"
-				+ " WHERE transfer_id = ?;"
-				+ " COMMIT;";
+				+ "UPDATE transfers " + "SET transfer_status_id = 2" + " WHERE transfer_id = ?;" + " COMMIT;";
 		int updatedCount = jdbcTemplate.update(sql, transfer.getTransfer_id(), transfer.getTransfer_id(),
 				transfer.getTransfer_id(), transfer.getTransfer_id(), transfer.getTransfer_id());
 		if (updatedCount == 3) {
@@ -107,6 +99,5 @@ public class TransferSqlDAO implements TransferDAO {
 		transfer.setAmount(rs.getBigDecimal("amount"));
 		return transfer;
 	}
-
 
 }

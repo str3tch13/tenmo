@@ -38,7 +38,7 @@ public class App {
 			MAIN_MENU_OPTION_VIEW_PAST_TRANSFERS, MAIN_MENU_OPTION_REQUEST_BUCKS,
 			MAIN_MENU_OPTION_VIEW_PENDING_REQUESTS, MAIN_MENU_OPTION_LOGIN, MENU_OPTION_EXIT };
 
-	public RestTemplate restTemplate = new RestTemplate();
+
 	public static String AUTH_TOKEN = "";
 
 	private AuthenticatedUser currentUser;

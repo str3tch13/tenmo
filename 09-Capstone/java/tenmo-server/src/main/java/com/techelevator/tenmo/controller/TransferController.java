@@ -1,8 +1,6 @@
 package com.techelevator.tenmo.controller;
 
-import java.math.BigDecimal;
 import java.security.Principal;
-import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,10 +29,10 @@ public class TransferController {
 	@RequestMapping(path = "/transfer", method = RequestMethod.GET)
 	public void getTransfers(Principal principal) {
 
-	long hello = accountController.getCurrentUserId(principal);
-	int helloInt = (int)hello;
-	transfer.setAccount_from(helloInt);
-	
+		long userId = accountController.getCurrentUserId(principal);
+		int userIdInt = (int) userId;
+		transfer.setAccount_from(userIdInt);
+
 	}
 
 	@RequestMapping(value = "/transfer", method = RequestMethod.POST)
@@ -45,10 +43,12 @@ public class TransferController {
 		return pendingTransfer;
 	}
 
-	//updates both accounts from the transfer
+	// updates both accounts from the transfer
 	@RequestMapping(value = "/transfer", method = RequestMethod.PUT)
 	public void makeTransfer(@RequestBody Transfer transfer) {
 		transferDAO.updateBalances(transfer);
 	}
+	
+	
 
 }
